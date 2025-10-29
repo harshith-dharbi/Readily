@@ -3,3 +3,4 @@ python-dotenv
 pymongo[srv]
 pdfplumber
 google-generativeai
+gunicorn
