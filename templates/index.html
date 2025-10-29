@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Readily Compliance Check</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --readily-blue: #3B82F6;
+            --readily-dark-blue: #2E4069;
+            --readily-light-bg: #F5F7FF;
+        }
+        .text-readily-blue { color: var(--readily-blue); }
+        .bg-readily-blue { background-color: var(--readily-blue); }
+        .border-readily-blue { border-color: var(--readily-blue); }
+        .text-readily-dark-blue { color: var(--readily-dark-blue); }
+        .bg-readily-light-bg { background-color: var(--readily-light-bg); }
+        body {
+            font-family: 'Geneva', 'Inter', sans-serif;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: var(--readily-blue);
+            animation: spin 1s ease infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @media print {
+            body { background: white; font-family: 'Geneva', 'Inter', sans-serif; }
+            #hero-section, #upload-section, #loading-section, #error-message, #start-over, #print-button { display: none !important; }
+            #results-section { display: block !important; margin-top: 0; padding-top: 0; }
+            .bg-white.shadow-2xl { box-shadow: none; border: none; }
+            .result-item { page-break-inside: avoid; border-bottom: 1px solid #eee; padding-bottom: 1rem; margin-bottom: 1rem; box-shadow: none; border-radius: 0; }
+            .result-item:last-child { border-bottom: none; }
+            details { page-break-inside: avoid; }
+            details summary { display: none; }
+            details[open] > div { display: block !important; margin-top: 0.5rem; }
+            .bg-gradient-to-b { background-image: none; background-color: white;}
+            .bg-readily-light-bg { background-color: white !important;}
+        }
+    </style>
+</head>
+<body class="bg-readily-light-bg min-h-screen">
+
+    <section id="hero-section" class="text-center py-8 px-4 md:px-8 bg-readily-light-bg">
+         <div class="flex justify-center items-center mb-6">
+            <span class="text-5xl font-bold text-blue-500">Readily</span>
+         </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-readily-dark-blue leading-tight mb-4">
+            Trusted Platform <br> for Healthcare Compliance
+        </h2>
+        <p class="text-lg text-gray-600 max-w-3xl mx-auto mb-6 font-light">
+            Readily automates repetitive regulatory compliance tasks, reducing administrative burdens and saving valuable staff hours for higher-impact initiatives.
+        </p>
+        <div class="flex justify-center items-center space-x-3 text-gray-500 font-medium text-sm">
+            <span>Backed by</span>
+            <span class="inline-flex items-center justify-center h-8 w-8 bg-orange-500 text-white font-bold rounded">Y</span>
+            <span class="text-orange-500 font-semibold">Combinator</span>
+        </div>
+    </section>
+
+    <div class="flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-4xl rounded-xl shadow-2xl p-6 md:p-10 mb-10 mt-2">
+
+            <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-6" role="alert">
+                <strong class="font-bold">Error:</strong>
+                <span id="error-text" class="block sm:inline">Something went wrong.</span>
+            </div>
+
+            <header class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-readily-dark-blue">Compliance Audit Tool</h2>
+                <p class="text-gray-600 mt-2">Upload your audit questions PDF to begin analysis.</p>
+            </header>
+
+            <div id="upload-section">
+                <form id="upload-form" class="border-2 border-dashed border-blue-200 rounded-xl p-10 text-center cursor-pointer hover:border-readily-blue hover:bg-blue-50/40 transition-colors">
+                    <input type="file" id="pdf-file" class="hidden" accept="application/pdf">
+                    <label for="pdf-file" class="cursor-pointer">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span class="mt-2 block text-sm font-medium text-gray-700">
+                            Click to upload your PDF
+                        </span>
+                    </label>
+                </form>
+                <div id="file-name" class="mx-auto w-fit mt-4 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-1.5 text-readily-blue text-sm font-medium hidden"></div>
+                <button id="start-analysis" class="mt-5 w-full bg-readily-blue text-white font-semibold py-3.5 px-4 rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 transition-colors disabled:bg-gray-300 disabled:text-gray-600 disabled:cursor-not-allowed" disabled>
+                    Start Analysis
+                </button>
+            </div>
+
+            <div id="loading-section" class="hidden text-center py-12">
+                <div class="spinner mx-auto"></div>
+                <p id="loading-text" class="mt-5 text-gray-600 font-medium">Analyzing all questions. This may take a moment...</p>
+            </div>
+
+            <div id="results-section" class="hidden">
+                <div class="flex justify-between items-center mb-6 border-b pb-2">
+                    <h3 class="text-2xl font-semibold text-readily-dark-blue">Analysis Results</h3>
+                    <button id="print-button" class="hidden ml-4 bg-readily-light-bg text-readily-blue text-sm font-medium py-2 px-4 rounded-lg hover:bg-blue-100 transition-colors">
+                        🖨️ Print Report
+                    </button>
+                    <button id="start-over" class="text-sm text-readily-blue hover:underline ml-auto">Start Over</button>
+                </div>
+                <div id="results-list" class="space-y-6">
+                    <!-- Results injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const uploadSection = document.getElementById('upload-section');
+            const uploadForm = document.getElementById('upload-form');
+            const pdfFile = document.getElementById('pdf-file');
+            const fileName = document.getElementById('file-name');
+            const startAnalysisBtn = document.getElementById('start-analysis');
+            const loadingSection = document.getElementById('loading-section');
+            const loadingText = document.getElementById('loading-text');
+            const resultsSection = document.getElementById('results-section');
+            const resultsList = document.getElementById('results-list');
+            const startOverBtn = document.getElementById('start-over');
+            const printButton = document.getElementById('print-button');
+            const errorMessage = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            let selectedFile = null;
+
+            // --- Utility Functions ---
+            function showError(message) {
+                errorText.textContent = message;
+                errorMessage.classList.remove('hidden');
+            }
+            function clearError() {
+                errorMessage.classList.add('hidden');
+            }
+            function escapeHTML(str) {
+                if (typeof str !== 'string') return '';
+                return str.replace(/[&<>"']/g, m => ({'&': '&amp;','<': '&lt;','>': '&gt;','"': '&quot;',"'": '&#39;'})[m]);
+            }
+            function resetUI() {
+                selectedFile = null;
+                pdfFile.value = '';
+                fileName.textContent = '';
+                fileName.classList.add('hidden');
+                startAnalysisBtn.disabled = true;
+                resultsSection.classList.add('hidden');
+                loadingSection.classList.add('hidden');
+                uploadSection.classList.remove('hidden');
+                printButton.classList.add('hidden');
+                resultsList.innerHTML = '';
+                clearError();
+            }
+            function displayResults(results) {
+                resultsList.innerHTML = '';
+                console.log('Raw results from server:', results); // Keep this for debugging
+
+                if (!results || results.length === 0) {
+                    resultsList.innerHTML = '<p class="text-gray-600">No results to display.</p>';
+                    return;
+                }
+
+                results.forEach((result, idx) => {
+                    const isMet = result.status === "Met";
+                    const evidenceText = result.evidence || (isMet ? 'Evidence not specified.' : 'N/A');
+                    const question = result.question || '';
+                    const statusPillClass = isMet ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                    const pillText = isMet ? 'MET' : 'NOT MET';
+                    let citation = '';
+                    let quote = 'N/A';
+
+                    if (isMet) {
+                        const evidenceMatch = evidenceText.match(/(\(From Filename:.*?, Page:.*?\))\s*(".*"|“.*”|'.*')/s);
+                        if (evidenceMatch) {
+                            citation = escapeHTML(evidenceMatch[1]);
+                            quote = escapeHTML(evidenceMatch[2]);
+                        } else {
+                            quote = escapeHTML(evidenceText);
+                        }
+                    }
+
+                    let cleanedQuestion = question.trim().replace(/^\d+\.\s*/, '');
+                    cleanedQuestion = cleanedQuestion.replace(/^Yes\s+No\s+/i, '');
+                    cleanedQuestion = cleanedQuestion.replace(/^\d+\.\s*/, '').trim();
+                    const displayQuestion = `${idx + 1}. ${escapeHTML(cleanedQuestion)}`;
+
+                    const resultHtml = `
+                        <div class="result-item bg-white border border-blue-100 rounded-xl p-5 shadow-sm hover:shadow-md transition">
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="flex-1 items-start">
+                                    <div>
+                                        <p class="text-xs font-medium text-gray-500">Requirement</p>
+                                        <p class="text-gray-800 mt-1">${displayQuestion}</p>
+                                    </div>
+                                </div>
+                                <span class="flex-shrink-0 inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${statusPillClass}">${pillText}</span>
+                            </div>
+                            <div class="mt-4">
+                                <details class="group" ${isMet ? 'open' : ''}>
+                                    <summary class="cursor-pointer text-sm text-readily-blue hover:text-blue-700">View evidence</summary>
+                                    <div class="mt-2 ml-1 space-y-1">
+                                        <p class="text-gray-700 italic">${citation}</p>
+                                        <p class="text-gray-700">${quote}</p>
+                                    </div>
+                                </details>
+                            </div>
+                        </div>
+                    `;
+                    resultsList.insertAdjacentHTML('beforeend', resultHtml);
+                });
+                 printButton.classList.remove('hidden');
+            }
+
+            // --- Event Listeners ---
+            pdfFile.addEventListener('change', (e) => {
+                clearError();
+                selectedFile = e.target.files[0];
+                if (selectedFile) {
+                    if (selectedFile.type !== 'application/pdf') {
+                        showError('Invalid file type. Please upload a PDF.');
+                        resetUI(); return;
+                    }
+                    fileName.textContent = selectedFile.name;
+                    fileName.classList.remove('hidden');
+                    startAnalysisBtn.disabled = false;
+                } else {
+                    fileName.textContent = '';
+                    fileName.classList.add('hidden');
+                    startAnalysisBtn.disabled = true;
+                }
+            });
+            uploadForm.addEventListener('dragover', (e) => { e.preventDefault(); uploadForm.classList.add('border-readily-blue'); });
+            uploadForm.addEventListener('dragleave', (e) => { e.preventDefault(); uploadForm.classList.remove('border-readily-blue'); });
+            uploadForm.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadForm.classList.remove('border-readily-blue');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    pdfFile.files = files;
+                    pdfFile.dispatchEvent(new Event('change'));
+                }
+            });
+            startAnalysisBtn.addEventListener('click', async () => {
+                if (!selectedFile) return;
+                clearError();
+                uploadSection.classList.add('hidden');
+                loadingSection.classList.remove('hidden');
+                loadingText.textContent = 'Uploading, extracting, and analyzing... This may take a moment.';
+                printButton.classList.add('hidden');
+
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+
+                try {
+                    const response = await fetch('/upload-audit-pdf', { method: 'POST', body: formData });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.error || `Server error: ${response.statusText}`);
+                    loadingSection.classList.add('hidden');
+                    resultsSection.classList.remove('hidden');
+                    displayResults(data);
+                } catch (error) {
+                    console.error('Analysis failed:', error);
+                    showError(`Failed to complete analysis: ${error.message}`);
+                    uploadSection.classList.remove('hidden');
+                    loadingSection.classList.add('hidden');
+                }
+            });
+            startOverBtn.addEventListener('click', resetUI);
+            printButton.addEventListener('click', () => { window.print(); });
+            fileName.classList.add('hidden'); // Initial state
+        });
+    </script>
+</body>
+</html>
+
